@@ -1,17 +1,25 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import Navbar from "@/components/Navbar";
+import CallToAction from "@/components/CTA";
+import Footer from "@/components/Footer";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
+  variable: "--font-inter",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+// const geistSans = Geist({
+//   variable: "--font-geist-sans",
+//   subsets: ["latin"],
+// });
+
+// const geistMono = Geist_Mono({
+//   variable: "--font-geist-mono",
+//   subsets: ["latin"],
+// });
 
 export const metadata = {
   title: "Create Next App",
@@ -20,9 +28,9 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased `}
+        className={`${inter.variable} font-sans`}
       >
         <ThemeProvider
           attribute="class"
@@ -30,8 +38,15 @@ export default function RootLayout({ children }) {
           enableSystem
           disableTransitionOnChange
         >
-          <div className="bg-gradient-to-r from-[#6366F1] to bg-[#4F46E5]">
+          <div>
+          <div className="md:px-10 px-4 bg-background dark:bg-[#00000D] text-gray-900 dark:text-gray-100">
+            <Navbar />
             {children}
+          </div>
+            <div className="">
+              <CallToAction/>
+              <Footer/>
+            </div>
             <Toaster />
           </div>
         </ThemeProvider>

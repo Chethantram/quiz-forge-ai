@@ -7,6 +7,11 @@ import { auth } from './firebase/config'
 import { useRouter } from 'next/navigation'
 import { connectDb } from '@/lib/db'
 import Navbar from '@/components/Navbar'
+import Hero from '@/components/Hero'
+import Features from '@/components/Features'
+import HowItWorks from '@/components/HowItWorks'
+import Testimonials from '@/components/Testimonical'
+import CallToAction from '@/components/CTA'
 
 const page = async() => {
   const router = useRouter();
@@ -22,8 +27,13 @@ const page = async() => {
   }, [router]);
 
   return (
-    <div>hi <ModeToggle/>
-    <Navbar/>
+    <div className='md:px-20 px-6'>
+      <Hero/>
+      <Features/>
+      <HowItWorks/>
+      <Testimonials/>
+      {/* <div className='px-0'><CallToAction/></div> */}
+      
     </div>
   )
 }
