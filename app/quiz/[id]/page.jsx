@@ -233,7 +233,7 @@ const QuizPage = ({ params }) => {
           <Button
             key={index}
             variant={'outline'}
-            className={`${selectedAnswer === option ? "bg-indigo-400 hover:bg-indigo-400 text-white hover:text-white dark:bg-indigo-400 dark:hover:bg-indigo-400" : ""} w-full text-left justify-start cursor-pointer`}
+            className={`${selectedAnswer === option ? "bg-indigo-400 hover:bg-indigo-400 text-white hover:text-white dark:bg-indigo-400 dark:hover:bg-indigo-400" : ""} w-full text-left justify-start cursor-pointer whitespace-normal break-words h-auto`}
             onClick={() => handleAnswerSelect(option)}
           >
             {option}
