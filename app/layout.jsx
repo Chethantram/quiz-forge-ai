@@ -1,10 +1,10 @@
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import {Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import Navbar from "@/components/Navbar";
-import CallToAction from "@/components/CTA";
 import Footer from "@/components/Footer";
+
 
 const inter = Inter({
   subsets: ["latin"],
@@ -29,9 +29,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${inter.variable} font-sans`}
-      >
+      <body className={`${inter.variable} font-sans`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -39,13 +37,12 @@ export default function RootLayout({ children }) {
           disableTransitionOnChange
         >
           <div>
-          <div className="md:px-10 px-4 bg-background dark:bg-[#00000D] text-gray-900 dark:text-gray-100">
-            <Navbar />
-            {children}
-          </div>
+            <div className="md:px-10 px-4 bg-background dark:bg-[#00000D] text-gray-900 dark:text-gray-100">
+              <Navbar />
+                <div className="min-h-screen">{children}</div>
+            </div>
             <div className="">
-              <CallToAction/>
-              <Footer/>
+              <Footer />
             </div>
             <Toaster />
           </div>

@@ -7,7 +7,6 @@ await connectDb();
 export const POST = async(data) => {
 try {
     const userData = await data.json();
-    console.log(userData);
     
     const {id,name,email} = userData;
     

@@ -29,23 +29,23 @@ const testimonials = [
 export default function Testimonials() {
   return (
     <section className="py-20">
-      <div className="max-w-7xl mx-auto px-6 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-12 text-indigo-600/80">
+      <div className="max-w-7xl mx-auto md:px-6 text-center">
+        <h2 className="text-3xl md:text-4xl font-bold mb-12 text-indigo-500">
           What Our Users Say
         </h2>
 
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-8 lg:grid-cols-3">
           {testimonials.map((t, index) => (
             <Card
               key={index}
-              className="rounded-2xl bg-transparent shadow-lg border border-emerald-500/50  hover:shadow-xl transition-shadow"
+              className="rounded-2xl shadow-lg border border-indigo-500/50 bg-indigo-100/40 dark:bg-gray-900/20  hover:shadow-xl transition-shadow"
             >
               <CardContent className="p-8 flex flex-col items-center text-center">
                 <Avatar className="w-16 h-16 mb-4">
                   <AvatarImage src={t.image} alt={t.name} />
                   <AvatarFallback>{t.name.charAt(0)}</AvatarFallback>
                 </Avatar>
-                <h3 className="text-lg font-semibold text-emerald-500">{t.name}</h3>
+                <h3 className="text-lg font-semibold text-indigo-500">{t.name}</h3>
                 <p className="text-sm text-muted-foreground mb-4">{t.role}</p>
                 <p className="text-muted-foreground italic">“{t.feedback}”</p>
               </CardContent>

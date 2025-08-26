@@ -9,7 +9,6 @@ import { useRouter } from "next/navigation";
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
-  getAuth,
   onAuthStateChanged,
 } from "firebase/auth";
 import { auth } from "../../firebase/config";
@@ -20,8 +19,6 @@ import { CircleCheckBig, Loader2 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import axios from "axios";
-import UseFetch from "@/hooks/use-fetch";
-import { createUser } from "@/actions/user";
 
 export default function Signup() {
   const {
@@ -62,7 +59,6 @@ export default function Signup() {
       };
       
       const res = await axios.post("/api/user/create", userData);
-      console.log(res.data);
 
       toast.success("Registration Successfully");
       reset();
@@ -91,9 +87,9 @@ export default function Signup() {
   }, [router]);
 
   return (
-    <div className="flex h-screen bg-background dark:bg-gray-900 w-full ">
+    <div className=" flex lg:h-screen bg-white dark:bg-[#00000D] w-full ">
       {/* Left Side Image */}
-      <div className="w-full hidden md:flex  bg-indigo-50  items-center justify-center">
+      <div className="w-full hidden lg:flex  bg-indigo-50  items-center justify-center">
         <img
           src={`/auth-light.png`}
           alt="QuizForge AI Illustration"
@@ -104,11 +100,11 @@ export default function Signup() {
       {/* Right Side Form */}
       <Card
         className={
-          "border-none mt-20  outline-none w-full md:mx-10 mx-4 dark:bg-transparent "
+          "border border-indigo-500 mt-24 md:mt-20 lg:border-none  outline-none w-full md:mx-10 mx-4 dark:bg-transparent "
         }
       >
         <CardHeader>
-          <CardTitle className={"text-2xl"}>
+          <CardTitle className={"text-2xl text-indigo-500"}>
             Register for QuizForge AI
           </CardTitle>
         </CardHeader>
@@ -196,7 +192,7 @@ export default function Signup() {
             Already have an account?{" "}
             <Link
               href="/sign-in"
-              className="text-indigo-500 dark:text-indigo-800 font-bold hover:underline"
+              className="text-indigo-500 dark:text-indigo-500 font-bold hover:underline"
             >
               Login
             </Link>

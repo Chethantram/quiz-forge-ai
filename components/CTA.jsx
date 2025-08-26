@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 
 export default function CallToAction() {
   return (
-    <section className="relative  bg-gradient-to-r from-indigo-600 to-purple-600 py-20 px-6 text-center text-white w-full shadow-xl">
+    <section className="relative  bg-gradient-to-r from-indigo-600 rounded-xl to-purple-600 py-20 px-6 text-center text-white w-full shadow-xl">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-4xl font-bold mb-4">
+        <h2 className="text-2xl md:text-4xl font-bold mb-4">
           Ready to Supercharge Your Learning?
         </h2>
-        <p className="text-lg text-indigo-100 mb-8">
+        <p className="text-md md:text-lg text-indigo-100 mb-8">
           Join QuizForge AI today and start mastering concepts with interactive quizzes and AI-powered insights.
         </p>
 

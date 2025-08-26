@@ -3,7 +3,7 @@ import { Github, Twitter, Linkedin } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-100 dark:bg-muted text-gray-800 py-10 px-6 mt-16">
+    <footer className="bg-gray-200 dark:bg-muted text-gray-800 py-10 px-6 mt-16">
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
         {/* Brand Section */}
         <div>
@@ -18,22 +18,22 @@ export default function Footer() {
           <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Quick Links</h3>
           <ul className="space-y-2 dark:text-gray-100">
             <li>
-              <Link href="/" className="hover:text-emerald-500">
+              <Link href="/" className="hover:text-indigo-500">
                 Home
               </Link>
             </li>
             <li>
-              <Link href="/about" className="hover:text-emerald-500">
+              <Link href="/about" className="hover:text-indigo-500">
                 About
               </Link>
             </li>
             <li>
-              <Link href="/features" className="hover:text-emerald-500">
+              <Link href="#features" className="hover:text-indigo-500">
                 Features
               </Link>
             </li>
             <li>
-              <Link href="/contact" className="hover:text-emerald-500">
+              <Link href="/" className="hover:text-indigo-500">
                 Contact
               </Link>
             </li>
@@ -41,17 +41,17 @@ export default function Footer() {
         </div>
 
         {/* Social Media */}
-        <div>
+        <div className="mt-10">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Follow Us</h3>
           <div className="flex space-x-4 dark:text-gray-100">
-            <Link href="https://github.com" target="_blank">
-              <Github className="w-6 h-6 hover:text-emerald-400" />
+            <Link href="https://github.com/Chethantram" target="_blank">
+              <Github className="w-6 h-6 hover:text-indigo-400" />
             </Link>
             <Link href="https://twitter.com" target="_blank">
-              <Twitter className="w-6 h-6 hover:text-emerald-400" />
+              <Twitter className="w-6 h-6 hover:text-indigo-400" />
             </Link>
-            <Link href="https://linkedin.com" target="_blank">
-              <Linkedin className="w-6 h-6 hover:text-emerald-400" />
+            <Link href="https://www.linkedin.com/in/chethant/" target="_blank">
+              <Linkedin className="w-6 h-6 hover:text-indigo-400" />
             </Link>
           </div>
         </div>

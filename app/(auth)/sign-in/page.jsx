@@ -5,14 +5,18 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import {onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import {
+  inMemoryPersistence,
+  onAuthStateChanged,
+  setPersistence,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { auth } from "../../firebase/config";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { loginSchema, userSchema } from "@/lib/zodSchema";
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function SignIn() {
@@ -26,43 +30,47 @@ export default function SignIn() {
 
   const router = useRouter();
 
-  const onSubmit = async (data) =>  {
+  const onSubmit = async (data) => {
     try {
       const email = data.email;
       const password = data.password;
-      console.log(email, password);
-      
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log(userCredential.user);
+
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
+      // const tokenId = await user?.getIdToken(true);
+      // console.log("user token:", tokenId);
+
+      // Store token in local storage with an expiry time of 24 hours
       
+
+      
+
       if (user.emailVerified) {
+        toast.success("Login Successfully");
+        reset();
         router.push("/");
+      } else {
+        toast.error("Please verify your email before logging in.");
+        // Optionally, you can sign out the user if not verified
+        // await auth.signOut();
       }
-      toast.success("Login Successfully");
-      reset();
     } catch (error) {
-      const errorCode = error.code;
       const errorMessage = error.message;
-      toast.error(errorMessage.split("auth/")[1]?.replace(").", "") || "Something went wrong");
+      toast.error(
+        errorMessage.split("auth/")[1]?.replace(").", "") ||
+          "Something went wrong"
+      );
     }
   };
 
-  // useEffect(() => {
-  //     const currentUser = onAuthStateChanged(auth,async(user)=>{      
-  //       if(user !== null) {
-  //         router.push("/");
-  //       }else{
-  //         router.push("/sign-in");
-  //       }
-  //     });
-  //     return ()=> currentUser;    
-  //   }, [router]);
-
   return (
-    <div className="flex h-screen bg-background dark:bg-gray-900 w-full ">
+    <div className="flex lg:h-screen bg-background dark:bg-[#00000D] w-full ">
       {/* Left Side Image */}
-      <div className="w-full hidden md:flex  bg-indigo-50  items-center justify-center">
+      <div className="w-full hidden lg:flex  bg-indigo-50  items-center justify-center">
         <img
           src={`/auth-light.png`}
           alt="QuizForge AI Illustration"
@@ -73,11 +81,11 @@ export default function SignIn() {
       {/* Right Side Form */}
       <Card
         className={
-          "border-none mt-20  outline-none w-full md:mx-10 mx-4 dark:bg-transparent "
+          "border border-indigo-500 mt-24 md:mt-20 lg:border-none  outline-none w-full md:mx-10 mx-4 dark:bg-transparent "
         }
       >
         <CardHeader>
-          <CardTitle className={"text-2xl"}>Login for QuizForge AI</CardTitle>
+          <CardTitle className={"text-2xl text-indigo-500"}>Login for QuizForge AI</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -125,7 +133,6 @@ export default function SignIn() {
 
             <Button
               disabled={isSubmitting}
-              
               type="submit"
               className="w-full bg-[#545CEF] dark:text-white hover:bg-indigo-700 cursor-pointer "
             >
@@ -142,7 +149,7 @@ export default function SignIn() {
             Don't have an account?{" "}
             <Link
               href="/sign-up"
-              className="text-indigo-500 dark:text-indigo-800 font-bold hover:underline"
+              className="text-indigo-500 dark:text-indigo-500 font-bold hover:underline"
             >
               Register
             </Link>
