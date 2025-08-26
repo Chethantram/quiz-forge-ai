@@ -38,6 +38,7 @@ const Navbar = () => {
     name: "",
     email: "",
   });
+  const [open, setOpen] = useState(false);
 
   const router = useRouter();
 
@@ -102,6 +103,12 @@ const Navbar = () => {
       setLoading(false);
     }
   };
+
+  const handleNavClick = (name) => {
+    setMenu(name);
+    setOpen(false); // close sheet after click
+  };
+
 
   useEffect(() => {
     if (userEmail) {
@@ -229,66 +236,66 @@ if(loading)
 
         {/* Mobile navbar */}
         <div className="lg:hidden">
-          <Sheet>
-            <SheetTrigger className="p-2 rounded-md border-2 border-gray-400/40 dark:border-gray-100/20 hover:bg-gray-100 dark:hover:bg-gray-900">
-              <Menu className="size-4 text-gray-800 dark:text-gray-100" />
-            </SheetTrigger>
-            <SheetContent className={"p-2"}>
-              <SheetHeader>
-                <SheetTitle>Menu</SheetTitle>
-                <SheetDescription>Choose a what you want and close it.</SheetDescription>
-              </SheetHeader>
-              <div>
-                <ul className="md:space-x-10 flex flex-col font-medium text-gray-800 dark:text-gray-100">
-                  <Link
-                    onClick={() => setMenu("Home")}
-                    href={"/"}
-                    className={`${
-                      menu === "Home"
-                        ? "bg-indigo-100/80 text-indigo-600 dark:text-indigo-400/80  dark:bg-gray-900/60 p-2 px-4 rounded-md"
-                        : "hover:bg-indigo-100/60 p-2 px-4 rounded-md dark:hover:bg-gray-900/40"
-                    } font-mono  `}
-                  >
-                    Home
-                  </Link>
-                  <Link
-                    onClick={() => setMenu("Generate")}
-                    href={"/generate-quiz"}
-                    className={`${
-                      menu === "Generate"
-                        ? "bg-indigo-100/80 text-indigo-600 dark:text-indigo-400/80 dark:bg-gray-900/60 p-2 px-4 rounded-md"
-                        : "hover:bg-indigo-100/60 p-2 px-4 rounded-md dark:hover:bg-gray-900/40"
-                    } font-mono  `}
-                  >
-                    GenerateQuiz
-                  </Link>
-                  <Link
-                    onClick={() => setMenu("Quiz")}
-                    href={`/my-quiz/${userId}`}
-                    className={`${
-                      menu === "Quiz"
-                        ? "bg-indigo-100/80 text-indigo-600 dark:text-indigo-400/80 dark:bg-gray-900/60 p-2 px-4 rounded-md"
-                        : "hover:bg-indigo-100/60 p-2 px-4 rounded-md dark:hover:bg-gray-900/40"
-                    } font-mono  `}
-                  >
-                    MyQuiz
-                  </Link>
-                  <Link
-                    onClick={() => setMenu("About")}
-                    href={"/about"}
-                    className={`${
-                      menu === "About"
-                        ? "bg-indigo-100/80 text-indigo-600 dark:text-indigo-400/80 dark:bg-gray-900/60 p-2 px-4 rounded-md"
-                        : "hover:bg-indigo-100/60 p-2 px-4 rounded-md dark:hover:bg-gray-900/40"
-                    } font-mono  `}
-                  >
-                    About
-                  </Link>
-                </ul>
-              </div>
-            </SheetContent>
-          </Sheet>
-        </div>
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetTrigger className="p-2 rounded-md border-2 border-gray-400/40 dark:border-gray-100/20 hover:bg-gray-100 dark:hover:bg-gray-900">
+          <Menu className="size-4 text-gray-800 dark:text-gray-100" />
+        </SheetTrigger>
+        <SheetContent className="p-2">
+          <SheetHeader>
+            <SheetTitle>Menu</SheetTitle>
+            <SheetDescription>Choose what you want and close it.</SheetDescription>
+          </SheetHeader>
+          <div>
+            <ul className="md:space-x-10 flex flex-col font-medium text-gray-800 dark:text-gray-100">
+              <Link
+                href="/"
+                onClick={() => handleNavClick("Home")}
+                className={`${
+                  menu === "Home"
+                    ? "bg-indigo-100/80 text-indigo-600 dark:text-indigo-400/80  dark:bg-gray-900/60 p-2 px-4 rounded-md"
+                    : "hover:bg-indigo-100/60 p-2 px-4 rounded-md dark:hover:bg-gray-900/40"
+                } font-mono`}
+              >
+                Home
+              </Link>
+              <Link
+                href="/generate-quiz"
+                onClick={() => handleNavClick("Generate")}
+                className={`${
+                  menu === "Generate"
+                    ? "bg-indigo-100/80 text-indigo-600 dark:text-indigo-400/80 dark:bg-gray-900/60 p-2 px-4 rounded-md"
+                    : "hover:bg-indigo-100/60 p-2 px-4 rounded-md dark:hover:bg-gray-900/40"
+                } font-mono`}
+              >
+                GenerateQuiz
+              </Link>
+              <Link
+                href={`/my-quiz/${userId}`}
+                onClick={() => handleNavClick("Quiz")}
+                className={`${
+                  menu === "Quiz"
+                    ? "bg-indigo-100/80 text-indigo-600 dark:text-indigo-400/80 dark:bg-gray-900/60 p-2 px-4 rounded-md"
+                    : "hover:bg-indigo-100/60 p-2 px-4 rounded-md dark:hover:bg-gray-900/40"
+                } font-mono`}
+              >
+                MyQuiz
+              </Link>
+              <Link
+                href="/about"
+                onClick={() => handleNavClick("About")}
+                className={`${
+                  menu === "About"
+                    ? "bg-indigo-100/80 text-indigo-600 dark:text-indigo-400/80 dark:bg-gray-900/60 p-2 px-4 rounded-md"
+                    : "hover:bg-indigo-100/60 p-2 px-4 rounded-md dark:hover:bg-gray-900/40"
+                } font-mono`}
+              >
+                About
+              </Link>
+            </ul>
+          </div>
+        </SheetContent>
+      </Sheet>
+    </div>
       </div>
     </nav>
   );
