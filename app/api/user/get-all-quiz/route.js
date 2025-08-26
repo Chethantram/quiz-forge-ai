@@ -9,7 +9,6 @@ await connectDb();
 export const POST = async (request) => {
   try {
     const { id } = await request.json();
-    console.log("server id:", id);
     
     if(!id) {
       return NextResponse.json(

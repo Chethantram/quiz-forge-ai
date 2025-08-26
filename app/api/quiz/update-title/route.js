@@ -9,7 +9,6 @@ export const POST = async (request) => {
     try {
         const data = await request.json();
         const {userId,quizId,title} = data;
-        console.log("userId,quizId,title:",userId,quizId,title);
         
         if(!userId || !quizId || !title) {
             return NextResponse.json(

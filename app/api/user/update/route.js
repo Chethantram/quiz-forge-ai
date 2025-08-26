@@ -8,8 +8,7 @@ await connectDb();
 export const POST = async (data) => {
   try {
     const { email,name,difficulty } = await data.json();
-     console.log("Email received for update:", email);
-     console.log("Data received for update:", data);
+
     if (!email) {
       return NextResponse.json(
         { message: "Email is required" },

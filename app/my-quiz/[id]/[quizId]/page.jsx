@@ -15,14 +15,12 @@ export default function QuizList({params}) {
   const [quizData,setQuizData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  console.log(quizData);
   
 
   useEffect(() => {
    const fetchQuiz = async() =>{
     try {
         const res = await axios.post('/api/quiz/get',{id:quizId});
-        console.log(res.data);
         if(res?.data?.success)
         {
             setQuiz(res?.data?.data)

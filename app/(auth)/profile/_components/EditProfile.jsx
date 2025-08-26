@@ -24,7 +24,6 @@ export function EditProfile({ children,user}) {
     const [difficulty, setDifficulty] = useState("" || user?.difficulty);
     const [loading, setLoading] = useState(false)
 
-    console.log(name,difficulty);
     
     const handleUpdate = async()=>{
         setLoading(true);
@@ -35,7 +34,6 @@ export function EditProfile({ children,user}) {
                 difficulty:difficulty
             }
             const res = await axios.post('/api/user/update',user);
-            console.log("User updated successfully:", res.data);
             if(res?.status === 200){
                 toast.success(res?.data?.message ||"Profile updated successfully");
                 window.location.reload();

@@ -41,8 +41,7 @@ export default function SignIn() {
         password
       );
       const user = userCredential.user;
-      // const tokenId = await user?.getIdToken(true);
-      // console.log("user token:", tokenId);
+
 
       // Store token in local storage with an expiry time of 24 hours
       

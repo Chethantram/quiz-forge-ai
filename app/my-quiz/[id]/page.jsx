@@ -57,7 +57,6 @@ const page = ({ params }) => {
         quizId: editingQuizId,
         title: titles[editingQuizId],
       });
-      console.log(res.data);
 
       if (res?.data?.success) {
         toast.success("Title updated successfully!");
