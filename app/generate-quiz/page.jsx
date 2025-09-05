@@ -115,7 +115,7 @@ export default function UploadQuizPage() {
             >
               <Upload className="w-10 h-10 text-gray-400 mb-2" />
               <p className="text-gray-600 dark:text-gray-300 text-sm md:text-md">
-                {file ? file.name : "Click to upload a file (PDF, DOCX, etc.)"}
+                {file ? file.name : "Click to upload a file (PDF)"}
               </p>
               <input
                 id="file-upload"
