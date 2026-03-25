@@ -4,10 +4,20 @@ import { GoogleGenAI } from "@google/genai";
 import { connectDb } from "@/lib/db";
 import Question from "@/lib/models/questions.model";
 import User from "@/lib/models/user.model";
+import { validateFile } from "@/lib/file-validation";
+import { rateLimitQuizGeneration } from "@/lib/rate-limiter";
+import { z } from "zod";
 
 await connectDb();
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+const generateQuizSchema = z.object({
+  question: z.coerce.number().int().min(1).max(50, "Cannot generate more than 50 questions"),
+  difficult: z.enum(["easy", "medium", "hard"]),
+  language: z.string().min(1),
+  email: z.string().email("Invalid email"),
+});
 
 export const POST = async (req) => {
   try {
@@ -18,31 +28,71 @@ export const POST = async (req) => {
     const language = formData.get("language");
     const email = formData.get("email");
 
-    if(!email){
+    // Validate required fields
+    const validationResult = generateQuizSchema.safeParse({
+      question,
+      difficult,
+      language,
+      email,
+    });
+
+    if (!validationResult.success) {
       return NextResponse.json(
-        {success:false, error: "User email is required" },
+        { success: false, error: validationResult.error.errors[0].message },
         { status: 400 }
       );
     }
 
-    const user = await User.findOne({email});
-    if(!user){
+    // Validate file
+    if (!file) {
       return NextResponse.json(
-        {success:false, error: "User not found" },
+        { success: false, error: "File is required" },
+        { status: 400 }
+      );
+    }
+
+    const fileValidation = validateFile(file);
+    if (!fileValidation.valid) {
+      return NextResponse.json(
+        { success: false, error: fileValidation.error },
+        { status: 400 }
+      );
+    }
+
+    // Check user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: "User not found" },
         { status: 404 }
       );
     }
 
-  
-    
+    // Rate limit: max 5 quizzes per hour per user
+    const rateLimitResult = rateLimitQuizGeneration(user._id.toString());
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: `Rate limit exceeded. ${rateLimitResult.reason}` 
+        },
+        { status: 429 } // Too Many Requests
+      );
+    }
 
-    const adminPrompt = `You are a quiz generator AI. The user will upload a file and provide additional instructions 
-such as the number of questions is ${question}, difficulty level is ${difficult}, and language is ${language}. 
+    const { question: numQuestions, difficult: difficulty, language: lang, email: userEmail } = validationResult.data;
 
-Read the uploaded file carefully and generate quiz questions based only on its content.
+    const adminPrompt = `You are a quiz generator AI. The user has uploaded a file for quiz generation.
 
-Return the output **strictly in JSON format** with the following structure:
+Requirements:
+- Generate exactly ${numQuestions} questions based on the file content
+- Difficulty level: ${difficulty}
+- Language: ${lang}
+- Each question must have exactly 4 options
+- The answer must be one of the options
+- Provide hints and explanations for each question
 
+Return ONLY valid JSON (no extra text) with this structure:
 {
   "questions": [
     {
@@ -53,29 +103,13 @@ Return the output **strictly in JSON format** with the following structure:
       "explanation": "string"
     }
   ]
-}
+}`;
 
-⚠️ Rules:
-- Generate exactly the number of questions requested by the user.
-- Each question must have **4 options**.
-- "answer" should be one of the options.
-- "hint" should give a small clue without giving away the answer.
-- "explanation" should briefly explain why the answer is correct.
-- Translate everything into the requested language.
-- Do not include any text outside the JSON.
-`;
-
-    if (!file || !question || !difficult || !language) {
-      return NextResponse.json(
-        {success:false, error: "All fields are required" },
-        { status: 400 }
-      );
-    }
-
-    // Read file buffer
+    // Read and encode file
     const bytes = await file.arrayBuffer();
     const base64 = Buffer.from(bytes).toString("base64");
 
+    // Generate quiz using Gemini AI
     const result = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: [
@@ -94,36 +128,70 @@ Return the output **strictly in JSON format** with the following structure:
       .replace(/```json\s*/g, "")
       .replace(/```/g, "")
       .trim();
-      
+
+    // Parse JSON response
     let responseObject;
     try {
       responseObject = JSON.parse(cleanedText);
-    } catch (e) {
-      throw new Error(`Invalid JSON response: ${e.message}\nReceived: ${cleanedText}`);
+    } catch (error) {
+      console.error("JSON parse error:", error);
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: "Invalid response format from AI. Please try again." 
+        },
+        { status: 500 }
+      );
     }
-    
-    // Create a single document with all questions
-    const res = await Question.create({
-      userId: user?._id,
-      language,
-      questions: responseObject.questions.map(q => ({
-        question: q.question,
-        options: q.options,
-        correctAnswer: q.answer,
-        hint: q.hint,
-        explanation: q.explanation,
-        difficulty: difficult
-      }))
+
+    // Validate response has questions
+    if (!responseObject.questions || !Array.isArray(responseObject.questions)) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: "Invalid quiz format generated. Please try again." 
+        },
+        { status: 500 }
+      );
+    }
+
+    // Create quiz document in database
+    const quizData = await Question.create({
+      userId: user._id,
+      language: lang,
+      difficulty: difficulty,
+      questions: responseObject.questions.map((q) => ({
+        question: q.question || "",
+        options: q.options || [],
+        correctAnswer: q.answer || "",
+        hint: q.hint || "",
+        explanation: q.explanation || "",
+        difficulty: difficulty,
+      })),
     });
-    
+
     return NextResponse.json(
-      { success: true,message: "Quiz generated successfully", data: res },
-      { status: 200 }
+      { 
+        success: true, 
+        message: "Quiz generated successfully",
+        data: quizData,
+        rateLimitRemaining: rateLimitResult.remaining 
+      },
+      { status: 201 } // Created
     );
   } catch (error) {
-    console.log(error);
+    console.error("Error generating quiz:", error);
+    
+    // Handle specific errors
+    if (error.message?.includes("API key")) {
+      return NextResponse.json(
+        { success: false, error: "AI service configuration error" },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(
-      {success:false, error: error.message || "Failed to process file" },
+      { success: false, error: error.message || "Failed to generate quiz. Please try again." },
       { status: 500 }
     );
   }

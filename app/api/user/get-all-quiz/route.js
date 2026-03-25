@@ -3,60 +3,62 @@ import { connectDb } from "@/lib/db";
 import Question from "@/lib/models/questions.model";
 import User from "@/lib/models/user.model";
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
 await connectDb();
 
+const getAllQuizSchema = z.object({
+  id: z.string().min(1, "User ID is required"),
+});
+
 export const POST = async (request) => {
   try {
-    const { id } = await request.json();
+    const body = await request.json();
     
-    if(!id) {
+    // Validate input
+    const validationResult = getAllQuizSchema.safeParse(body);
+    if (!validationResult.success) {
       return NextResponse.json(
-        { success: false, error: "User ID is required" },
+        { success: false, error: validationResult.error.errors[0].message },
         { status: 400 }
       );
     }
 
-    const user = await User.findById(id).populate({
-      path: 'quizCompleted',
-      model: Question
-    });
-    if(!user) {
+    const { id } = validationResult.data;
+    
+    // Check if user exists
+    const user = await User.findById(id);
+    if (!user) {
       return NextResponse.json(
         { success: false, error: "User not found" },
         { status: 404 }
       );
     }
-    user.quizCompleted.sort((a, b) => b.createdAt - a.createdAt);
+
+    // Populate completed quizzes
+    const userData = await User.findById(id).populate({
+      path: 'quizCompleted',
+      model: Question,
+      select: 'title difficulty language averageScore createdAt questions'
+    });
+
+    // Sort by creation date (newest first)
+    const quizzes = userData.quizCompleted?.sort((a, b) => {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    }) || [];
+
     return NextResponse.json(
-      { success: true, data: user.quizCompleted || [] },
+      { success: true, data: quizzes, count: quizzes.length },
       { status: 200 }
     );
   } catch (error) {
-    console.log(error);
+    console.error('Error fetching quizzes:', error);
     return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to fetch user",
-        details: error.message,
-      },
+      { success: false, error: "Failed to fetch quizzes" },
       { status: 500 }
     );
   }
-};
-
-// export const POST = async (req) => {
-//   try {
-//     let body;
-//     try {
-//       body = await req.json();
-//     } catch (e) {
-//       return NextResponse.json(
-//         { success: false, error: "Invalid JSON in request body" },
-//         { status: 400 }
-//       );
-//     }
-//     const { id } = body;
+}
 
 //     if (!id) {
 //       return NextResponse.json(

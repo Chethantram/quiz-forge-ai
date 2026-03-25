@@ -36,14 +36,18 @@ export function EditProfile({ children,user}) {
             const res = await axios.post('/api/user/update',user);
             if(res?.status === 200){
                 toast.success(res?.data?.message ||"Profile updated successfully");
-                window.location.reload();
+                // Update user state instead of hard reload
+                // Close dialog
+                setName('');
+                setDifficulty('');
+                // User will see updated profile without full page reload
             }else{
                 toast.error(res?.data?.message ||"Something went wrong");
             }
             
         } catch (error) {
             console.log(error);
-
+            toast.error('Failed to update profile');
             
         }finally{
             setLoading(false);

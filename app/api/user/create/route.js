@@ -2,32 +2,67 @@
 import { connectDb } from "@/lib/db";
 import User from "@/lib/models/user.model";
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
 await connectDb();
-export const POST = async(data) => {
-try {
-    const userData = await data.json();
+
+const createUserSchema = z.object({
+  id: z.string().min(1, "User ID is required"),
+  name: z.string().min(2, "Name must be at least 2 characters").max(100, "Name must be less than 100 characters"),
+  email: z.string().email("Invalid email address"),
+});
+
+export const POST = async (request) => {
+  try {
+    const body = await request.json();
     
-    const {id,name,email} = userData;
-    
-    if (!id || !name || !email) {
-      return NextResponse.json({ success: false, message: "All fields are Required" });
+    // Validate input
+    const validationResult = createUserSchema.safeParse(body);
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { success: false, message: validationResult.error.errors[0].message },
+        { status: 400 }
+      );
     }
 
-    const user = await User.findOne({ email });
-    if (user) {
-      return NextResponse.json({ success: false, message: "User Already exists" });
+    const { id, name, email } = validationResult.data;
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return NextResponse.json(
+        { success: false, message: "User with this email already exists" },
+        { status: 409 } // Conflict
+      );
     }
 
-    const newUser = await User.create({id, name, email });
+    // Create new user
+    const newUser = await User.create({
+      id,
+      name,
+      email,
+    });
 
     if (!newUser) {
-      return NextResponse.json({ success: false, message: "User not created" });
+      return NextResponse.json(
+        { success: false, message: "Failed to create user" },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({ success: true, message: "User created successfully" });
+    return NextResponse.json(
+      { 
+        success: true, 
+        message: "User created successfully",
+        data: newUser 
+      },
+      { status: 201 } // Created
+    );
   } catch (error) {
-    console.log(error);
-    return NextResponse.json({ success: false,message:error});
+    console.error('Error creating user:', error);
+    return NextResponse.json(
+      { success: false, message: "Failed to create user" },
+      { status: 500 }
+    );
   }
 }

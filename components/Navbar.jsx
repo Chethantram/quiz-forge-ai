@@ -51,9 +51,9 @@ const Navbar = () => {
           name: user.displayName || "User",
           email: user.email,
         });
-      } else {
-        router.push("/sign-in");
       }
+      // If user is not authenticated, show Login button in navbar
+      // Do NOT redirect - let user stay on home page
     });
     return () => currentUser();
   }, [router]);
@@ -68,23 +68,7 @@ const Navbar = () => {
     }
   };
 
-  useEffect(() => {
-    const currentUser = onAuthStateChanged(auth, (user) => {
-      // setLoading(true);
-      try {
-        if (user) {
-          setUserEmail(user.email);
-        } else {
-          router.push("/sign-in");
-        }
-      } catch (error) {
-        console.log(error);
-      } finally {
-        // setLoading(false);
-      }
-    });
-    return () => currentUser();
-  }, [auth]);
+  // Removed duplicate onAuthStateChanged listener - using first one above instead
 
   const getUserId = async () => {
     setLoading(true);

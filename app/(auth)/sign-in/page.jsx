@@ -111,6 +111,14 @@ export default function SignIn() {
                   {errors.password.message}
                 </p>
               )}
+              <div className="text-right mt-2">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-indigo-500 dark:text-indigo-400 hover:underline"
+                >
+                  Forgot Password?
+                </Link>
+              </div>
             </div>
             {/* CheckBox */}
             <div className="flex items-start gap-3 mt-4 ">

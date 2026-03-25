@@ -29,6 +29,8 @@ export default function UploadQuizPage() {
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
   const [email, setEmail] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
   const router = useRouter();
   
   
@@ -74,22 +76,34 @@ export default function UploadQuizPage() {
   };
 
   
-  
   useEffect(() => {
-      const currentUser = onAuthStateChanged(auth, async (user) => {
-        try {
-          
-          if (user !== null) {
-            setEmail(user?.email);
-          } else {
-            router.push("/sign-in");
-          }
-        } catch (error) {
-          console.log(error);
+    const currentUser = onAuthStateChanged(auth, async (user) => {
+      try {
+        if (user !== null) {
+          setEmail(user?.email);
+          setIsAuthenticated(true);
+        } else {
+          // User not authenticated - redirect to sign-in
+          router.push("/sign-in");
         }
-      });
-      return () => currentUser;
-    }, [router,auth]);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsChecking(false);
+      }
+    });
+    return () => currentUser;
+  }, [router, auth]);
+
+  // Show loader while checking authentication
+  if (isChecking) {
+    return <GenerateQuizLoader />;
+  }
+
+  // Don't render page if user is not authenticated
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="md:py-2 py-8 lg:px-24 md:px-8 px-4">

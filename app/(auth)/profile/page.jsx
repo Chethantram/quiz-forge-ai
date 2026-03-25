@@ -5,8 +5,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import axios from "axios";
 import { onAuthStateChanged } from "firebase/auth";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { EditProfile } from "./_components/EditProfile";
 import NavigationLoader from "@/components/navigation-loader";
 
@@ -26,7 +28,6 @@ const ProfilePage = () => {
   const [userEmail, setUserEmail] = React.useState("");
 
   const getUser = async () => {
-    setLoading(true);
     try {
       const res = await axios.post("/api/user/get", { email: userEmail });
       if (res.data.success) {
@@ -39,14 +40,14 @@ const ProfilePage = () => {
           averageScore: res?.data?.data?.averageScore || 0,
           quizCompleted: res?.data?.data?.quizCompleted || [],
         });
-      
+        setLoading(false);
       } else {
         toast.error(res.data.error || "Failed to fetch user data");
+        setLoading(false);
       }
     } catch (error) {
       console.log("Error in getUser:", error);
       toast.error("Failed to fetch user data");
-    }finally{
       setLoading(false);
     }
   };
@@ -63,6 +64,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     if (userEmail) {
+      setLoading(true);
       getUser();
     }
   }, [userEmail]);
@@ -145,6 +147,29 @@ const ProfilePage = () => {
               <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-2xl border">
                 <label className="text-sm text-gray-600 dark:text-gray-400 font-medium">Average Score</label>
                 <p className="font-semibold">{user.averageScore || "0"}%</p>
+              </div>
+            </div>
+
+            {/* Security Section */}
+            <div className="mt-8 pt-6 border-t border-indigo-200 dark:border-indigo-800">
+              <h3 className="text-lg font-semibold mb-4 text-indigo-600 dark:text-indigo-400">Security</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Link href="/change-password" className="action-button p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition">
+                  <p className="font-semibold text-blue-600 dark:text-blue-400">🔐 Change Password</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Update your password</p>
+                </Link>
+                
+                <button 
+                  onClick={() => {
+                    if (window.confirm('Are you sure you want to delete your account? This cannot be undone.')) {
+                      router.push('/delete-account');
+                    }
+                  }}
+                  className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/40 transition text-left"
+                >
+                  <p className="font-semibold text-red-600 dark:text-red-400">🗑️ Delete Account</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Permanently delete your account</p>
+                </button>
               </div>
             </div>
           </div>
