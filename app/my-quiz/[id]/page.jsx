@@ -59,7 +59,9 @@ const page = ({ params }) => {
       });
 
       if (res?.data?.success) {
-        toast.success("Title updated successfully!");
+        toast.success("Title Updated", {
+          description: `Quiz renamed to "${titles[editingQuizId]}"`
+        });
         const updatedQuizzes = completedQuizzes.map((quiz) =>
           quiz._id === editingQuizId
             ? { ...quiz, title: titles[editingQuizId] }
@@ -72,11 +74,17 @@ const page = ({ params }) => {
         }));
         setEditingQuizId(null);
       } else {
-        toast.error(res?.data?.error || "Failed to update title");
+        const errorMsg = res?.data?.message || "Failed to update title";
+        toast.error("Update Failed", {
+          description: errorMsg
+        });
       }
     } catch (error) {
+      const errorMsg = error?.response?.data?.message || "Failed to update quiz";
+      toast.error("Error", {
+        description: errorMsg
+      });
       console.log(error);
-      toast.error("Failed to update quiz");
     } finally {
       setButtonLoading(false);
     }

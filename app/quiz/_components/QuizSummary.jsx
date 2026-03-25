@@ -45,13 +45,21 @@ const QuizSummary = ({
         averageScore: avg,
       });
       if (res.data.success) {
-        toast.success("Quiz Completed successfully!");
+        toast.success("Quiz Completed Successfully!", {
+          description: `Your score of ${avg}% has been saved`
+        });
       } else {
-        toast.error(res.data.error || "Failed to update quiz");
+        const errorMsg = res.data.message || "Failed to update quiz";
+        toast.error("Update Failed", {
+          description: errorMsg
+        });
       }
     } catch (error) {
+      const errorMsg = error?.response?.data?.message || "Failed to update quiz";
+      toast.error("Error", {
+        description: errorMsg
+      });
       console.log("Error in handleUpdate:", error);
-      toast.error("Failed to update quiz");
     } finally {
       setLoading(false);
     }

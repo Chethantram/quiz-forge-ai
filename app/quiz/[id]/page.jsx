@@ -3,8 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import axios from "axios";
-import QuizSummary from "../_components/QuizSummary";
+import axios from "axios";import { toast } from "sonner";import QuizSummary from "../_components/QuizSummary";
 
 const QuizPage = ({ params }) => {
   const id = params?.id;
@@ -37,11 +36,19 @@ const QuizPage = ({ params }) => {
         setLanguage(data?.data?.language)
         setQuizData(data.data.questions);
       } else {
-        setError(data?.error || 'Failed to fetch quiz data');
+        const errorMsg = data?.message || 'Failed to fetch quiz data';
+        setError(errorMsg);
+        toast.error("Failed to Load Quiz", {
+          description: errorMsg
+        });
       }
     } catch (error) {
       console.error("Error fetching quiz data:", error);
-      setError(error?.response?.data?.error || error.message || 'Failed to fetch quiz');
+      const errorMsg = error?.response?.data?.message || error.message || 'Failed to fetch quiz';
+      setError(errorMsg);
+      toast.error("Quiz Loading Error", {
+        description: errorMsg
+      });
     } finally {
       setIsLoading(false);
     }
@@ -95,6 +102,14 @@ const QuizPage = ({ params }) => {
       localStorage.removeItem(`quiz-${id}-completed`);
       localStorage.removeItem(`quiz-${id}-state`);
       localStorage.setItem(`quiz-${id}-retakes`, retakesLeft - 1);
+      
+      toast.success("Quiz Reset", {
+        description: `Starting fresh retake ${3 - retakesLeft} of 2`
+      });
+    } else {
+      toast.error("No Retakes Left", {
+        description: "You've used all your retakes for this quiz"
+      });
     }
   };
 
@@ -189,6 +204,16 @@ const QuizPage = ({ params }) => {
     localStorage.setItem(`quiz-${id}-state`, JSON.stringify(finalState));
     localStorage.setItem(`quiz-${id}-completed`, 'true');
     setShowSummary(true);
+    
+    // Show completion toast
+    const correctCount = quizData.filter((q, idx) => 
+      answers[idx] === q.correctAnswer
+    ).length;
+    const score = Math.round((correctCount / quizData.length) * 100);
+    
+    toast.success("Quiz Completed!", {
+      description: `Score: ${correctCount}/${quizData.length} (${score}%)`
+    });
   };
 
   return (

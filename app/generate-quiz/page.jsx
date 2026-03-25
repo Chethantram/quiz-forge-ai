@@ -42,6 +42,21 @@ export default function UploadQuizPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate form fields
+    if (!file) {
+      toast.error("Please select a file");
+      return;
+    }
+    if (!numQuestions) {
+      toast.error("Please select number of questions");
+      return;
+    }
+    if (!difficulty) {
+      toast.error("Please select difficulty level");
+      return;
+    }
+    
     setLoading(true);
     setError(null);
     try {
@@ -52,25 +67,61 @@ export default function UploadQuizPage() {
       formdata.append("language", language);
       formdata.append("email", email);
 
-      
-      
       const res = await axios.post("/api/generate-quiz", formdata);
       const responseData = res?.data;
       setData(responseData);      
       
       if(responseData?.success) {
-        toast.success("Quiz generated successfully!");
+        toast.success("Quiz generated successfully!", {
+          description: `${numQuestions} questions created • Remaining this hour: ${responseData.rateLimitRemaining}`
+        });
         if (responseData?.data?._id) {
           router.push(`/quiz/${responseData.data._id}`);
         }
       } else {
-        toast.error(responseData?.message || "Failed to generate quiz");
+        const errorMessage = responseData?.message || "Failed to generate quiz";
+        
+        // Handle specific error cases
+        if (res.status === 429 || errorMessage.includes("Rate limit")) {
+          toast.error("Rate Limit Exceeded", {
+            description: errorMessage,
+            duration: 5000
+          });
+        } else if (errorMessage.includes("File")) {
+          toast.error("File Error", {
+            description: errorMessage
+          });
+        } else {
+          toast.error("Generation Failed", {
+            description: errorMessage
+          });
+        }
       }
       
     } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || "Failed to generate quiz";
+      
+      if (error.response?.status === 429) {
+        toast.error("Rate Limit Exceeded", {
+          description: errorMessage,
+          duration: 5000
+        });
+      } else if (errorMessage.includes("File")) {
+        toast.error("File Error", {
+          description: errorMessage
+        });
+      } else if (errorMessage.includes("User not found")) {
+        toast.error("User Error", {
+          description: "User account not found. Please sign in again."
+        });
+        router.push("/sign-in");
+      } else {
+        toast.error("Error", {
+          description: errorMessage
+        });
+      }
       setError(error);
-      console.log(error);
-    }finally{
+    } finally{
       setLoading(false);
     }
   };

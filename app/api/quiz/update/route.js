@@ -46,7 +46,7 @@ export const POST = async (req) => {
     const validationResult = updateQuizSchema.safeParse(body);
     if (!validationResult.success) {
       return NextResponse.json(
-        { success: false, error: validationResult.error.errors[0].message },
+        { success: false, message: validationResult.error.errors[0].message },
         { status: 400 }
       );
     }
@@ -65,7 +65,7 @@ export const POST = async (req) => {
 
     if (!updatedQuiz) {
       return NextResponse.json(
-        { success: false, error: "Quiz not found" },
+        { success: false, message: "Quiz not found" },
         { status: 404 }
       );
     }
@@ -74,7 +74,7 @@ export const POST = async (req) => {
     const user = await User.findById(updatedQuiz.userId);
     if (!user) {
       return NextResponse.json(
-        { success: false, error: "User not found" },
+        { success: false, message: "User not found" },
         { status: 404 }
       );
     }
@@ -112,7 +112,7 @@ export const POST = async (req) => {
   } catch (error) {
     console.error("Error in quiz update route:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to update quiz" },
+      { success: false, message: "Failed to update quiz" },
       { status: 500 }
     );
   }

@@ -35,19 +35,27 @@ export function EditProfile({ children,user}) {
             }
             const res = await axios.post('/api/user/update',user);
             if(res?.status === 200){
-                toast.success(res?.data?.message ||"Profile updated successfully");
+                toast.success("Profile Updated", {
+                  description: res?.data?.message || "Your profile has been updated successfully"
+                });
                 // Update user state instead of hard reload
                 // Close dialog
                 setName('');
                 setDifficulty('');
                 // User will see updated profile without full page reload
             }else{
-                toast.error(res?.data?.message ||"Something went wrong");
+                const errorMsg = res?.data?.message || "Something went wrong";
+                toast.error("Update Failed", {
+                  description: errorMsg
+                });
             }
             
         } catch (error) {
+            const errorMsg = error?.response?.data?.message || "Failed to update profile";
+            toast.error("Error", {
+              description: errorMsg
+            });
             console.log(error);
-            toast.error('Failed to update profile');
             
         }finally{
             setLoading(false);

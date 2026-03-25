@@ -38,7 +38,7 @@ export const POST = async (req) => {
 
     if (!validationResult.success) {
       return NextResponse.json(
-        { success: false, error: validationResult.error.errors[0].message },
+        { success: false, message: validationResult.error.errors[0].message },
         { status: 400 }
       );
     }
@@ -46,7 +46,7 @@ export const POST = async (req) => {
     // Validate file
     if (!file) {
       return NextResponse.json(
-        { success: false, error: "File is required" },
+        { success: false, message: "File is required" },
         { status: 400 }
       );
     }
@@ -54,7 +54,7 @@ export const POST = async (req) => {
     const fileValidation = validateFile(file);
     if (!fileValidation.valid) {
       return NextResponse.json(
-        { success: false, error: fileValidation.error },
+        { success: false, message: fileValidation.error },
         { status: 400 }
       );
     }
@@ -63,7 +63,7 @@ export const POST = async (req) => {
     const user = await User.findOne({ email });
     if (!user) {
       return NextResponse.json(
-        { success: false, error: "User not found" },
+        { success: false, message: "User not found" },
         { status: 404 }
       );
     }
@@ -74,7 +74,7 @@ export const POST = async (req) => {
       return NextResponse.json(
         { 
           success: false, 
-          error: `Rate limit exceeded. ${rateLimitResult.reason}` 
+          message: `Rate limit exceeded. ${rateLimitResult.reason}` 
         },
         { status: 429 } // Too Many Requests
       );
@@ -138,7 +138,7 @@ Return ONLY valid JSON (no extra text) with this structure:
       return NextResponse.json(
         { 
           success: false, 
-          error: "Invalid response format from AI. Please try again." 
+          message: "Invalid response format from AI. Please try again." 
         },
         { status: 500 }
       );
@@ -149,7 +149,7 @@ Return ONLY valid JSON (no extra text) with this structure:
       return NextResponse.json(
         { 
           success: false, 
-          error: "Invalid quiz format generated. Please try again." 
+          message: "Invalid quiz format generated. Please try again." 
         },
         { status: 500 }
       );
@@ -185,13 +185,13 @@ Return ONLY valid JSON (no extra text) with this structure:
     // Handle specific errors
     if (error.message?.includes("API key")) {
       return NextResponse.json(
-        { success: false, error: "AI service configuration error" },
+        { success: false, message: "AI service configuration error" },
         { status: 500 }
       );
     }
 
     return NextResponse.json(
-      { success: false, error: error.message || "Failed to generate quiz. Please try again." },
+      { success: false, message: error.message || "Failed to generate quiz. Please try again." },
       { status: 500 }
     );
   }

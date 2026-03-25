@@ -25,12 +25,18 @@ export default function QuizList({params}) {
         {
             setQuiz(res?.data?.data)
             setQuizData(res?.data?.data?.questions);
-
         }else{
-            toast.error("something is wrong");
+            const errorMsg = res?.data?.message || "Failed to load quiz";
+            toast.error("Quiz Load Error", {
+              description: errorMsg
+            });
         }
         
     } catch (error) {
+        const errorMsg = error?.response?.data?.message || error.message || "Failed to load quiz";
+        toast.error("Error", {
+          description: errorMsg
+        });
         console.log(error);
     }
     setLoading(false);

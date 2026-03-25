@@ -19,7 +19,7 @@ export const POST = async(req) => {
     const validationResult = getQuizSchema.safeParse(body);
     if (!validationResult.success) {
       return NextResponse.json(
-        { success: false, error: validationResult.error.errors[0].message },
+        { success: false, message: validationResult.error.errors[0].message },
         { status: 400 }
       );
     }
@@ -30,7 +30,7 @@ export const POST = async(req) => {
     const quiz = await Question.findById(id).populate('userId', 'email');
     if (!quiz) {
       return NextResponse.json(
-        { success: false, error: "Quiz not found" },
+        { success: false, message: "Quiz not found" },
         { status: 404 }
       );
     }
@@ -38,7 +38,7 @@ export const POST = async(req) => {
     // Optional: Verify user owns the quiz if userId is provided
     if (userId && quiz.userId._id.toString() !== userId) {
       return NextResponse.json(
-        { success: false, error: "Unauthorized: You don't have access to this quiz" },
+        { success: false, message: "Unauthorized: You don't have access to this quiz" },
         { status: 403 }
       );
     }
@@ -50,7 +50,7 @@ export const POST = async(req) => {
   } catch (error) {
     console.error("Error in quiz GET route:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to fetch quiz" },
+      { success: false, message: "Failed to fetch quiz" },
       { status: 500 }
     );
   }

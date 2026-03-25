@@ -23,7 +23,7 @@ export const POST = async (request) => {
     const validationResult = updateTitleSchema.safeParse(body);
     if (!validationResult.success) {
       return NextResponse.json(
-        { success: false, error: validationResult.error.errors[0].message },
+        { success: false, message: validationResult.error.errors[0].message },
         { status: 400 }
       );
     }
@@ -34,7 +34,7 @@ export const POST = async (request) => {
     const quiz = await Question.findById(quizId);
     if (!quiz) {
       return NextResponse.json(
-        { success: false, error: "Quiz not found" },
+        { success: false, message: "Quiz not found" },
         { status: 404 }
       );
     }
@@ -42,7 +42,7 @@ export const POST = async (request) => {
     // Check ownership
     if (quiz.userId.toString() !== userId) {
       return NextResponse.json(
-        { success: false, error: "Forbidden: You do not have permission to update this quiz" },
+        { success: false, message: "Forbidden: You do not have permission to update this quiz" },
         { status: 403 }
       );
     }
@@ -58,7 +58,7 @@ export const POST = async (request) => {
   } catch (error) {
     console.error('Error updating quiz title:', error);
     return NextResponse.json(
-      { success: false, error: "Failed to update quiz title" },
+      { success: false, message: "Failed to update quiz title" },
       { status: 500 }
     );
   }
