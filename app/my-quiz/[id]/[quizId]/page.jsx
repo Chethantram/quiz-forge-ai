@@ -9,7 +9,7 @@ import NavigationLoader from "@/components/navigation-loader";
 
 
 export default function QuizList({params}) {
-    const quizId = params?.quizId;
+    const { quizId } = React.use(params);
   const [activeQuiz, setActiveQuiz] = useState(null);
   const [quiz, setQuiz] = useState({});
   const [quizData,setQuizData] = useState([]);

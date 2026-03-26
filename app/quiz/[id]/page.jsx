@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import axios from "axios";import { toast } from "sonner";import QuizSummary from "../_components/QuizSummary";
 
 const QuizPage = ({ params }) => {
-  const id = params?.id;
+  const { id } = React.use(params);
   const [quizData, setQuizData] = useState([]);
   const [language, setLanguage] = useState("English");
   const [answers, setAnswers] = useState({});

@@ -9,7 +9,7 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const page = ({ params }) => {
-  const id = params?.id;
+  const { id } = React.use(params);
   const [editingQuizId, setEditingQuizId] = useState(null);
   const [titles, setTitles] = useState({});
   const [completedQuizzes, setCompletedQuizzes] = useState([]);
